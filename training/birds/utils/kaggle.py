@@ -34,16 +34,18 @@ def download_competition_data(competition: str, input_path: str | Path) -> None:
         print(os.listdir(data_path))
 
 
-def download_dataset(owner: str, dataset: str, input_path: str | Path) -> None:
+def download_dataset(owner: str, dataset: str, input_path: str | Path) -> bool:
     """
     Downloads data from kaggle competition only if input folder is empty
     :param comptetition: string with the competition name id of kaggle
     :param input_path: path of the input folder
     """
+    downloaded = False
     data_path = Path(input_path)
     if not data_path.exists():
         data_path.mkdir(parents=True)
     if not any(data_path.iterdir()):
+        downloaded = True
         api.dataset_download_files(f"{owner}/{dataset}", path=data_path)
         with ZipFile(data_path / (dataset + ".zip"), "r") as zipObj:
             # Extract all the contents of zip file in current directory
@@ -51,3 +53,5 @@ def download_dataset(owner: str, dataset: str, input_path: str | Path) -> None:
         os.remove(data_path / (dataset + ".zip"))
 
         print(os.listdir(data_path))
+
+    return downloaded

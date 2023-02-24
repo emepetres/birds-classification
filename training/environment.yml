@@ -10,7 +10,7 @@ dependencies:
   - pip
   - cudatoolkit=11.7
   - pytorch==1.13.1
-  - torchvision
+  - torchvision==0.14.1
   - pytorch-cuda=11.7
   - fastcore=1.5.28
   - fastai=2.7.11
