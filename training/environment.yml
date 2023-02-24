@@ -1,0 +1,21 @@
+name: fastai
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - fastchan
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - cudatoolkit=11.7
+  - pytorch==1.13.1
+  - torchvision
+  - pytorch-cuda=11.7
+  - fastcore=1.5.28
+  - fastai=2.7.11
+  - pip:
+      - ipykernel
+      - ipywidgets
+      - timm==0.6.12
+      - kaggle==1.5.12
