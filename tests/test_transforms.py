@@ -22,7 +22,7 @@ def get_birds_images(path: Path) -> List[str]:
 
 
 class TestTransforms:
-    im_idx = 0
+    im_idx = 50
 
     @pytest.fixture
     def img_paths(self) -> List[str]:
@@ -30,19 +30,28 @@ class TestTransforms:
         return get_birds_images(path.resolve())
 
     @pytest.fixture
-    def im_fastai(self, img_paths) -> PILImage:
+    def im_fastai(self, img_paths: List[str]) -> PILImage:
         fname = img_paths[self.im_idx]
         return PILImage.create(fname)
 
     @pytest.fixture
-    def im_pil(self, img_paths) -> Image:
+    def im_pil(self, img_paths: List[str]) -> Image:
         fname = img_paths[self.im_idx]
         return Image.open(fname)
 
-    def testImageFastaiEqualsPillow(self, im_fastai, im_pil):
+    def testImageFastaiEqualsPillow(self, im_fastai: PILImage, im_pil: Image):
         assert (np.array(im_fastai) == np.array(im_pil)).all()
 
-    def testCropPadFastaiEqualsTorch(self, im_fastai, im_pil):
+    def testRandomResizedCropEqualsCropPadInValidation(self, im_fastai: PILImage):
+        crop_fastai = fastai_aug.CropPad((460, 460))
+        crop_rrc = fastai_aug.RandomResizedCrop((460, 460))
+
+        cropped_fastai = crop_rrc(im_fastai, split_idx=1)
+        cropped_rrc = crop_fastai(im_fastai, split_idx=1)
+
+        assert (np.array(cropped_rrc) == np.array(cropped_fastai)).all()
+
+    def testCropPadFastaiEqualsTorch(self, im_fastai: PILImage, im_pil: Image):
         crop_fastai = fastai_aug.CropPad((460, 460))
         crop_torch = CenterCropPad((460, 460))
 
