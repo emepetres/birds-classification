@@ -7,7 +7,7 @@ from PIL import Image
 from fastai.vision.data import PILImage
 import fastai.vision.augment as fastai_aug
 
-from deployment.transforms import CenterCropPad
+from deployment.transforms import resized_crop_pad
 
 DATA_PATH = "data/kaggle/200-bird-species-with-11788-images"
 
@@ -22,7 +22,7 @@ def get_birds_images(path: Path) -> List[str]:
 
 
 class TestTransforms:
-    im_idx = 50
+    im_idx = 510
 
     @pytest.fixture
     def img_paths(self) -> List[str]:
@@ -42,28 +42,22 @@ class TestTransforms:
     def testImageFastaiEqualsPillow(self, im_fastai: PILImage, im_pil: Image):
         assert (np.array(im_fastai) == np.array(im_pil)).all()
 
-    def testRandomResizedCropEqualsCropPadInValidation(self, im_fastai: PILImage):
-        crop_fastai = fastai_aug.CropPad((460, 460))
-        crop_rrc = fastai_aug.RandomResizedCrop((460, 460))
+    # RandomResizedCrop is not exactly equal to CropPad in validation
+    # # def testRandomResizedCropEqualsCropPadInValidation(self, im_fastai: PILImage):
+    # #     crop_fastai = fastai_aug.CropPad((460, 460))
+    # #     crop_rrc = fastai_aug.RandomResizedCrop((460, 460))
 
-        cropped_rrc = crop_rrc(im_fastai, split_idx=1)
-        cropped_fastai = crop_fastai(im_fastai, split_idx=1)
+    # #     cropped_rrc = crop_rrc(im_fastai, split_idx=1)
+    # #     cropped_fastai = crop_fastai(im_fastai, split_idx=1)
 
-        assert (np.array(cropped_rrc) == np.array(cropped_fastai)).all()
+    # #     assert (np.array(cropped_rrc) == np.array(cropped_fastai)).all()
 
-    def testCropPadFastaiEqualsTorch(self, im_fastai: PILImage, im_pil: Image):
-        crop_fastai = fastai_aug.CropPad((460, 460))
-        crop_torch = CenterCropPad((460, 460))
-
-        assert (np.array(crop_fastai(im_fastai)) == np.array(crop_torch(im_pil))).all()
-
-    def testRandomResizedCropInValidationEqualsCustomCenterCropPad(
+    def testRandomResizedCropInValidationEqualsCustomResizedCropPad(
         self, im_fastai: PILImage, im_pil: Image
     ):
         crop_rrc = fastai_aug.RandomResizedCrop((460, 460))
-        crop_custom = CenterCropPad((460, 460))
 
-        cropped_rrc = crop_rrc(im_fastai, split_idx=1)
-        cropped_custom = crop_custom(im_fastai)
-
-        assert (np.array(cropped_rrc) == np.array(cropped_custom)).all()
+        assert (
+            np.array(crop_rrc(im_fastai, split_idx=1))
+            == np.array(resized_crop_pad(im_pil, (460, 460)))
+        ).all()

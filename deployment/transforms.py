@@ -14,9 +14,7 @@ from PIL import Image
 # # from timm import create_model
 
 
-def center_crop(
-    image: Union[Image.Image, torch.tensor], size: Tuple[int, int]
-) -> Image:
+def crop(image: Union[Image.Image, torch.tensor], size: Tuple[int, int]) -> Image:
     """
     Takes a `PIL.Image` and crops it `size` unless one
     dimension is larger than the actual image. Padding
@@ -71,28 +69,33 @@ def pad(image, size: Tuple[int, int]) -> Image:
     return tvf.pad(image, [pad_top, pad_left, height, width], padding_mode="constant")
 
 
-def CenterCropPad(size: tuple[Literal[460], Literal[460]], val_xtra: float = 0.14):
+def resized_crop_pad(
+    image: Union[Image.Image, torch.tensor],
+    size: Tuple[int, int],
+    extra_crop_ratio: float = 0.14,
+) -> Image:
     """
+    Takes a `PIL.Image`, resize it according to the
+    `extra_crop_ratio`, and then crops and pads
+    it to `size`.
+
     Args:
         image (`PIL.Image`):
             An image to perform padding on
         size (`tuple` of integers):
-            A size to pad to, should be in the form
+            A size to crop and pad to, should be in the form
             of (width, height)
-        val_xtra: The ratio of size at the edge cropped out in the validation set
+        extra_crop_ratio (float):
+            The ratio of size at the edge cropped out. Default 0.14
     """
-    # return tvtfms.CenterCrop(size)
-    def _crop_pad(img):
-        orig_sz = img.shape
-        xtra = math.ceil(max(*size[:2]) * val_xtra / 8) * 8
-        final_size = (size[0] + xtra, size[1] + xtra)
 
-        res = pad(center_crop(img, orig_sz), orig_sz).resize(
-            final_size, resample=Image.Resampling.BILINEAR
-        )
-        if final_size != size:
-            res = pad(center_crop(res, size), size)
+    maximum_space = max(size[0], size[1])
+    extra_space = maximum_space * extra_crop_ratio
+    extra_space = math.ceil(extra_space / 8) * 8
+    extended_size = (size[0] + extra_space, size[1] + extra_space)
+    resized_image = image.resize(extended_size, resample=Image.Resampling.BILINEAR)
 
-        return res
+    if extended_size != size:
+        resized_image = pad(crop(resized_image, size), size)
 
-    return _crop_pad
+    return resized_image
