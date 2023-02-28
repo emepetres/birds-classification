@@ -46,8 +46,8 @@ class TestTransforms:
         crop_fastai = fastai_aug.CropPad((460, 460))
         crop_rrc = fastai_aug.RandomResizedCrop((460, 460))
 
-        cropped_fastai = crop_rrc(im_fastai, split_idx=1)
-        cropped_rrc = crop_fastai(im_fastai, split_idx=1)
+        cropped_rrc = crop_rrc(im_fastai, split_idx=1)
+        cropped_fastai = crop_fastai(im_fastai, split_idx=1)
 
         assert (np.array(cropped_rrc) == np.array(cropped_fastai)).all()
 
@@ -56,3 +56,14 @@ class TestTransforms:
         crop_torch = CenterCropPad((460, 460))
 
         assert (np.array(crop_fastai(im_fastai)) == np.array(crop_torch(im_pil))).all()
+
+    def testRandomResizedCropInValidationEqualsCustomCenterCropPad(
+        self, im_fastai: PILImage, im_pil: Image
+    ):
+        crop_rrc = fastai_aug.RandomResizedCrop((460, 460))
+        crop_custom = CenterCropPad((460, 460))
+
+        cropped_rrc = crop_rrc(im_fastai, split_idx=1)
+        cropped_custom = crop_custom(im_fastai)
+
+        assert (np.array(cropped_rrc) == np.array(cropped_custom)).all()

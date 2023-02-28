@@ -1,3 +1,4 @@
+import math
 from typing import Literal, Union, Tuple
 
 import torch
@@ -70,9 +71,28 @@ def pad(image, size: Tuple[int, int]) -> Image:
     return tvf.pad(image, [pad_top, pad_left, height, width], padding_mode="constant")
 
 
-def CenterCropPad(size: tuple[Literal[460], Literal[460]]):
+def CenterCropPad(size: tuple[Literal[460], Literal[460]], val_xtra: float = 0.14):
+    """
+    Args:
+        image (`PIL.Image`):
+            An image to perform padding on
+        size (`tuple` of integers):
+            A size to pad to, should be in the form
+            of (width, height)
+        val_xtra: The ratio of size at the edge cropped out in the validation set
+    """
     # return tvtfms.CenterCrop(size)
     def _crop_pad(img):
-        return pad(center_crop(img, size), size)
+        orig_sz = img.shape
+        xtra = math.ceil(max(*size[:2]) * val_xtra / 8) * 8
+        final_size = (size[0] + xtra, size[1] + xtra)
+
+        res = pad(center_crop(img, orig_sz), orig_sz).resize(
+            final_size, resample=Image.Resampling.BILINEAR
+        )
+        if final_size != size:
+            res = pad(center_crop(res, size), size)
+
+        return res
 
     return _crop_pad
