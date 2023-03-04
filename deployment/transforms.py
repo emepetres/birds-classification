@@ -1,9 +1,9 @@
 import math
-from typing import Literal, Union, Tuple
+from typing import Union, Tuple
 
 import torch
 
-# # import torch.nn.functional as F
+import torch.nn.functional as F
 import torchvision.transforms.functional as tvf
 
 # import torchvision.transforms as tvtfms
@@ -99,3 +99,44 @@ def resized_crop_pad(
         resized_image = pad(crop(resized_image, size), size)
 
     return resized_image
+
+
+def gpu_crop(batch: torch.tensor, size: Tuple[int, int]):
+    """
+    Crops each image in `batch` to a particular `size`.
+
+    Args:
+        batch (array of `torch.Tensor`):
+            A batch of images, should be of shape `NxCxWxH`
+        size (`tuple` of integers):
+            A size to pad to, should be in the form
+            of (width, height)
+
+    Returns:
+        A batch of cropped images
+    """
+    # Split into multiple lines for clarity
+    affine_matrix = torch.eye(3, device=batch.device).float()
+    affine_matrix = affine_matrix.unsqueeze(0)
+    affine_matrix = affine_matrix.expand(batch.size(0), 3, 3)
+    affine_matrix = affine_matrix.contiguous()[:, :2]
+
+    coords = F.affine_grid(affine_matrix, batch.shape[:2] + size, align_corners=True)
+
+    top_range, bottom_range = coords.min(), coords.max()
+    zoom = 1 / (bottom_range - top_range).item() * 2
+
+    resizing_limit = (
+        min(batch.shape[-2] / coords.shape[-2], batch.shape[-1] / coords.shape[-1]) / 2
+    )
+
+    if resizing_limit > 1 and resizing_limit > zoom:
+        batch = F.interpolate(
+            batch,
+            scale_factor=1 / resizing_limit,
+            mode="area",
+            recompute_scale_factor=True,
+        )
+    return F.grid_sample(
+        batch, coords, mode="bilinear", padding_mode="reflection", align_corners=True
+    )

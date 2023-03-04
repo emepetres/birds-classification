@@ -4,10 +4,12 @@ from pathlib import Path
 from typing import List
 import numpy as np
 from PIL import Image
+import torch
+import torchvision.transforms as tvtfms
 from fastai.vision.data import PILImage
 import fastai.vision.augment as fastai_aug
 
-from deployment.transforms import resized_crop_pad
+from deployment.transforms import resized_crop_pad, gpu_crop
 
 DATA_PATH = "data/200-bird-species-with-11788-images"
 
@@ -43,7 +45,7 @@ class TestTransforms:
         assert (np.array(im_fastai) == np.array(im_pil)).all()
 
     # RandomResizedCrop is not exactly equal to CropPad in validation
-    # # def testRandomResizedCropEqualsCropPadInValidation(self, im_fastai: PILImage):
+    # # def testRandomResizedCropEqualsCropPad(self, im_fastai: PILImage):
     # #     crop_fastai = fastai_aug.CropPad((460, 460))
     # #     crop_rrc = fastai_aug.RandomResizedCrop((460, 460))
 
@@ -52,7 +54,7 @@ class TestTransforms:
 
     # #     assert (np.array(cropped_rrc) == np.array(cropped_fastai)).all()
 
-    def testRandomResizedCropInValidationEqualsCustomResizedCropPad(
+    def testRandomResizedCropEqualsCustomResizedCropPad(
         self, im_fastai: PILImage, im_pil: Image
     ):
         crop_rrc = fastai_aug.RandomResizedCrop((460, 460))
@@ -61,3 +63,20 @@ class TestTransforms:
             np.array(crop_rrc(im_fastai, split_idx=1))
             == np.array(resized_crop_pad(im_pil, (460, 460)))
         ).all()
+
+    def testFlipEqualsCustomGPUCrop(self, im_fastai: PILImage, im_pil: Image):
+        tt_fastai = fastai_aug.ToTensor()
+        i2f_fastai = fastai_aug.IntToFloatTensor()
+        flip = fastai_aug.Flip(size=(224, 224))
+        tt_torch = tvtfms.ToTensor()
+
+        # apply flip augmentation on validation
+        result_im_fastai = flip(
+            i2f_fastai(tt_fastai(im_fastai).unsqueeze(0)), split_idx=1
+        )
+
+        # apply custom gpu crop
+        result_im_tv = gpu_crop(tt_torch(im_pil).unsqueeze(0), size=(224, 224))
+
+        assert torch.allclose(result_im_fastai, result_im_tv)
+        assert (result_im_fastai == result_im_tv).all()
