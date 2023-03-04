@@ -19,3 +19,6 @@ dependencies:
       - ipywidgets
       - timm==0.6.12
       - kaggle==1.5.12
+      - flake8
+      - black
+      - pytest

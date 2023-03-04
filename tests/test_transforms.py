@@ -9,7 +9,7 @@ import fastai.vision.augment as fastai_aug
 
 from deployment.transforms import resized_crop_pad
 
-DATA_PATH = "data/kaggle/200-bird-species-with-11788-images"
+DATA_PATH = "data/200-bird-species-with-11788-images"
 
 
 def get_birds_images(path: Path) -> List[str]:
