@@ -4,21 +4,25 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "deployment/**"
+      - "models/**/*.pth"
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  copy_files:
+  copy_deployment_files:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           ref: main
+          lfs: true
 
-      - name: Setup Git
-        run: |
-          git config --global user.email "javier@carnero.net"
-          git config --global user.name "Javier Carnero"
-      - name: Push deployment files to gradio branch
+      - name: Update deployment files
         run: |
           mkdir -p temp
           cp -r deployment/* temp
@@ -26,9 +30,16 @@ jobs:
           cp .gitattributes temp
           git fetch
           git checkout gradio
-          find . -not -path "./temp/*" -delete
+          shopt -s extglob
+          rm -rf !(temp|*/.git)
           cp -r temp/* .
           rm -rf temp
+          sed -i 's/\.\.\/models\/vit_saved\.pth/\.\/vit_saved\.pth/g' app.py
+
+      - name: Push deployment files to gradio branch
+        run: |
+          git config --global user.email "javier@carnero.net"
+          git config --global user.name "Javier Carnero"
           git add .
           git commit -m "Copy deployment files to gradio branch"
           git push origin gradio
