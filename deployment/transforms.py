@@ -30,14 +30,14 @@ def crop(image: Union[Image.Image, torch.tensor], size: Tuple[int, int]) -> Imag
     Returns:
         An augmented `PIL.Image`
     """
-    top = (image.shape[-1] - size[0]) // 2
-    left = (image.shape[-2] - size[1]) // 2
+    top = (image.size[-2] - size[0]) // 2
+    left = (image.size[-1] - size[1]) // 2
 
     top = max(top, 0)
     left = max(left, 0)
 
-    height = min(top + size[0], image.shape[-1])
-    width = min(left + size[1], image.shape[-2])
+    height = min(top + size[0], image.size[-2])
+    width = min(left + size[1], image.size[-1])
     return image.crop((top, left, height, width))
 
 
@@ -56,15 +56,15 @@ def pad(image, size: Tuple[int, int]) -> Image:
     Returns:
         An augmented `PIL.Image`
     """
-    top = (image.shape[-1] - size[0]) // 2
-    left = (image.shape[-2] - size[1]) // 2
+    top = (image.size[-2] - size[0]) // 2
+    left = (image.size[-1] - size[1]) // 2
 
     pad_top = max(-top, 0)
     pad_left = max(-left, 0)
 
     height, width = (
-        max(size[1] - image.shape[-1] + top, 0),
-        max(size[0] - image.shape[-2] + left, 0),
+        max(size[1] - image.size[-2] + top, 0),
+        max(size[0] - image.size[-1] + left, 0),
     )
     return tvf.pad(image, [pad_top, pad_left, height, width], padding_mode="constant")
 
