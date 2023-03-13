@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+permissions:
+  contents: write
 
 jobs:
   copy_files:
@@ -18,6 +20,7 @@ jobs:
         run: |
           git config --global user.email "javier@carnero.net"
           git config --global user.name "Javier Carnero"
+
       - name: Push deployment files to gradio branch
         run: |
           mkdir -p temp
