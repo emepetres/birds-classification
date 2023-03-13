@@ -17,6 +17,7 @@ dependencies:
   - pip:
       - ipykernel
       - ipywidgets
+      - gradio==3.20.1
       - timm==0.6.12
       - kaggle==1.5.12
       - flake8

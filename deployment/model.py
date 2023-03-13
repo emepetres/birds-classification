@@ -46,8 +46,8 @@ def apply_weights(
     application_function: callable,
 ):
     """
-    Takes an input state_dict and applies those weights to the `input_model`, potentially
-    with a modifier function.
+    Takes an input state_dict and applies those weights to the `input_model`,
+    potentially with a modifier function.
 
     Args:
         input_model (`nn.Module`):
@@ -56,7 +56,8 @@ def apply_weights(
             A dictionary of weights, the trained model's `state_dict()`
         application_function (`callable`):
             A function that takes in one parameter and layer name from `input_model`
-            and the `input_weights`. Should apply the weights from the state dict into `input_model`.
+            and the `input_weights`. Should apply the weights from the state dict into
+            `input_model`.
     """
     model_dict = input_model.state_dict()
     for name, parameter in model_dict.items():

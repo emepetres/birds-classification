@@ -76,5 +76,6 @@ if __name__ == "__main__":
 
     learner.fine_tune(7, base_lr=0.001, freeze_epochs=12)
 
-    learner.export("models/vit_exported")
+    learner.export(Path(config.MODELS_STORAGE_PATH).resolve() / "vit_exported.pkl")
+    learner.model_dir = Path(config.MODELS_STORAGE_PATH).resolve()
     learner.save("vit_saved", with_opt=False)
