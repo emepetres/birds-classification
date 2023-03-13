@@ -15,7 +15,7 @@ def get_model() -> nn.Sequential:
         nn.ReLU(inplace=True),
         nn.BatchNorm1d(512),
         nn.Dropout(0.5),
-        nn.Linear(512, 37, bias=False),
+        nn.Linear(512, 200, bias=False),
     )
 
     return nn.Sequential(net, head)
