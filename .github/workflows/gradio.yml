@@ -26,7 +26,8 @@ jobs:
           cp .gitattributes temp
           git fetch
           git checkout gradio
-          find . -not -path "./temp/*" -delete
+          shopt -s extglob
+          rm -rf !(temp|*/.git)
           cp -r temp/* .
           rm -rf temp
           git add .
