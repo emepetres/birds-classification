@@ -7,7 +7,7 @@ from transforms import resized_crop_pad, gpu_crop
 from torchvision.transforms import Normalize, ToTensor
 
 model = get_model()
-state = torch.load("../models/vit_saved.pth", map_location="cpu")
+state = torch.load("./vit_saved.pth", map_location="cpu")
 apply_weights(model, state, copy_weight)
 
 to_tensor = ToTensor()
