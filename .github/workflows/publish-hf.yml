@@ -1,9 +1,10 @@
 name: Publish to Hugging Face
 
 on:
-  push:
-    branches:
-      - gradio
+  workflow_dispatch:
+# #   push:
+# #     branches:
+# #       - gradio
 
 jobs:
   publish_to_huggingface:
@@ -26,12 +27,10 @@ jobs:
           shopt -s extglob
           cd hf-repo
           rm -rf !(.git)
-
       - name: Setup Git
         run: |
           git config --global user.email "javier@carnero.net"
           git config --global user.name "Javier Carnero"
-
       - name: Publish gradio to Hugging Face repository
         run: |
           cp -r ${{ github.workspace }}/* hf-repo/
