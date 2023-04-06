@@ -1,9 +1,8 @@
 name: Deploy to Hugging Face hub
 on:
-  # push:
-  #   branches:
-  #     - gradio
-  workflow_dispatch:
+  push:
+    branches:
+      - gradio
 
 jobs:
   sync-to-hub:
