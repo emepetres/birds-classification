@@ -40,12 +40,18 @@ jobs:
           git config --global user.name "Javier Carnero"
           git fetch
           git checkout gradio
+          echo "--------"
+          git branch -a
+          echo "--------"
+          git remote show origin
+          echo "--------"
+          echo "--------"
           find . -mindepth 1 ! -regex '^./temp\(/.*\)?' -delete
           cp -r temp/. .
           rm -rf temp
           sed -i 's/\.\.\/models\/vit_saved\.pth/\.\/vit_saved\.pth/g' app.py
           git add -A .
-          git diff-index --quiet HEAD || git commit -m "Copy deployment files to gradio branch"
+          git diff-index --quiet gradio || git commit -m "Copy deployment files to gradio branch"
           echo "--------"
           git branch -a
           echo "--------"
