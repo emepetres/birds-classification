@@ -46,4 +46,10 @@ jobs:
           sed -i 's/\.\.\/models\/vit_saved\.pth/\.\/vit_saved\.pth/g' app.py
           git add -A .
           git diff-index --quiet HEAD || git commit -m "Copy deployment files to gradio branch"
+          echo "--------"
+          git branch -a
+          echo "--------"
+          git remote show origin
+          echo "--------"
+          echo "--------"
           git push origin gradio
