@@ -1,4 +1,4 @@
-name: Copy deployment files to gradio branch
+name: Update deployment files on gradio branch
 
 on:
   push:
@@ -15,7 +15,7 @@ permissions:
   contents: write
 
 jobs:
-  copy_deployment_files:
+  update_deployment_files:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,7 +24,7 @@ jobs:
           ref: main
           lfs: true
 
-      - name: Update deployment files
+      - name: Build deployment folder
         run: |
           mkdir -p temp
           cp -r deployment/* temp
@@ -33,22 +33,17 @@ jobs:
           cp -r .github temp/
           cp .gitattributes temp
           cp LICENSE temp
+
+      - name: Update gradio branch
+        run: |
+          git config --global user.email "javier@carnero.net"
+          git config --global user.name "Javier Carnero"
           git fetch
           git checkout gradio
           find . -mindepth 1 ! -regex '^./temp\(/.*\)?' -delete
           cp -r temp/. .
           rm -rf temp
           sed -i 's/\.\.\/models\/vit_saved\.pth/\.\/vit_saved\.pth/g' app.py
-
-      - name: Push deployment files to gradio branch
-        run: |
-          git config --global user.email "javier@carnero.net"
-          git config --global user.name "Javier Carnero"
-          ls -lh
-          git branch -a
-          git fetch
-          git branch -a
-          git remote show origin
           git add -A .
           git diff-index --quiet HEAD || git commit -m "Copy deployment files to gradio branch"
           git push origin gradio
