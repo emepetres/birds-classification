@@ -8,7 +8,7 @@ on:
 jobs:
   check-file-size:
     runs-on: ubuntu-latest
-    permissions: read-all
+    permissions: write-all
     steps:
       - name: Check large files
         uses: ActionsDesk/lfs-warning@v2.0
