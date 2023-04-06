@@ -1,6 +1,6 @@
 ---
 title: Birds classifier
-emoji: :bird:
+emoji: 🐦
 colorFrom: red
 colorTo: pink
 sdk: gradio
