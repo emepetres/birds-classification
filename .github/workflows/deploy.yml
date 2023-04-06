@@ -1,8 +1,8 @@
-name: Sync to Hugging Face hub
+name: Deploy to Hugging Face hub
 on:
-  push:
-    branches:
-      - gradio
+  # push:
+  #   branches:
+  #     - gradio
   workflow_dispatch:
 
 jobs:
@@ -16,4 +16,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://jcarnero:$HF_TOKEN@huggingface.co/spaces/jcarnero/birds-classifier main
+        run: git push https://jcarnero:$HF_TOKEN@huggingface.co/spaces/jcarnero/birds-classification main

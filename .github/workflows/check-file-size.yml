@@ -1,12 +1,12 @@
 name: Check file size
 on:
-  push:
-    branches:
-      - gradio
+  # push:
+  #   branches:
+  #     - gradio
   workflow_dispatch:
 
 jobs:
-  sync-to-hub:
+  check-file-size:
     runs-on: ubuntu-latest
     steps:
       - name: Check large files
