@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PUSH_PAT_TOKEN }}
+          token: ${{ secrets.PUSH_PAT_TOKEN }} # this is necessary to trigger further workflows by push
           ref: main
           lfs: true
 
@@ -49,5 +49,5 @@ jobs:
           git config --global user.email "javier@carnero.net"
           git config --global user.name "Javier Carnero"
           git add -A .
-          git diff-index --quiet gradio || git commit -m "Copy deployment files to gradio branch"
+          git diff-index --quiet gradio || git commit -m "Updated deployment"
           git push origin gradio
