@@ -36,7 +36,7 @@ jobs:
           git fetch
           git checkout gradio
           find . -mindepth 1 ! -regex '^./temp\(/.*\)?' -delete
-          cp -r temp/* .
+          cp -r temp/. .
           rm -rf temp
           sed -i 's/\.\.\/models\/vit_saved\.pth/\.\/vit_saved\.pth/g' app.py
 
