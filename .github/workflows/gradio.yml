@@ -21,6 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
+          token: ${{ secrets.PUSH_PAT_TOKEN }}
           ref: main
           lfs: true
 
