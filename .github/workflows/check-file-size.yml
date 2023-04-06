@@ -1,16 +1,14 @@
 name: Check file size
 on:
-  # push:
-  #   branches:
-  #     - gradio
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   check-file-size:
     runs-on: ubuntu-latest
-    permissions: write-all
     steps:
       - name: Check large files
-        uses: ActionsDesk/lfs-warning@v2.0
+        uses: ppremk/lfs-warning@v3.2
         with:
-          filesizelimit: 10485760 # this is 10MB so we can sync to HF Spaces
+          filesizelimit: 10MB # so we can sync to HF Spaces
