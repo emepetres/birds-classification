@@ -7,6 +7,8 @@ on:
     paths:
       - "deployment/**"
       - "models/**/*.pth"
+      - ".github/workflows/**"
+      - ".github/actions/**"
   workflow_dispatch:
 
 permissions:
@@ -27,7 +29,9 @@ jobs:
           mkdir -p temp
           cp -r deployment/* temp
           cp models/vit_saved.pth temp
+          cp -r .github temp/
           cp .gitattributes temp
+          cp LICENSE temp
           git fetch
           git checkout gradio
           shopt -s extglob
@@ -40,6 +44,6 @@ jobs:
         run: |
           git config --global user.email "javier@carnero.net"
           git config --global user.name "Javier Carnero"
-          git add .
+          git add -A .
           git diff-index --quiet HEAD || git commit -m "Copy deployment files to gradio branch"
           git push origin gradio
