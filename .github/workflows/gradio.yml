@@ -41,5 +41,5 @@ jobs:
           git config --global user.email "javier@carnero.net"
           git config --global user.name "Javier Carnero"
           git add .
-          git commit -m "Copy deployment files to gradio branch"
+          git diff-index --quiet HEAD || git commit -m "Copy deployment files to gradio branch"
           git push origin gradio
