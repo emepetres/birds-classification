@@ -44,6 +44,11 @@ jobs:
         run: |
           git config --global user.email "javier@carnero.net"
           git config --global user.name "Javier Carnero"
+          ls -lh
+          git branch -a
+          git fetch
+          git branch -a
+          git remote show origin
           git add -A .
           git diff-index --quiet HEAD || git commit -m "Copy deployment files to gradio branch"
           git push origin gradio
