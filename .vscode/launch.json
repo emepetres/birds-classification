@@ -5,11 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Debug Tests",
+            "name": "Tests",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "purpose": ["debug-test"],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "App",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/deployment/app.py",
+            "cwd": "${workspaceFolder}/deployment",
             "console": "integratedTerminal",
             "justMyCode": false
         }
