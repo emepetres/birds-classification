@@ -14,6 +14,15 @@ to_tensor = ToTensor()
 norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
 
+def decode_pred(pred: torch.Tensor) -> str:
+    indices = pred > 0.95
+    if indices.any():
+        # return first match
+        return vocab[indices.nonzero()[0]]
+    else:
+        return "I don't know what this is, ¡páharo!"
+
+
 def classify_image(inp):
     inp = Image.fromarray(inp)
     transformed_input = resized_crop_pad(inp, (460, 460))
@@ -23,8 +32,7 @@ def classify_image(inp):
     model.eval()
     with torch.no_grad():
         pred = model(transformed_input)
-    pred = torch.argmax(pred, dim=1)
-    return vocab[pred]
+    return decode_pred(torch.sigmoid(pred).squeeze(dim=0))
 
 
 iface = gr.Interface(

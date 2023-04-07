@@ -1,3 +1,4 @@
+from functools import partial
 import os
 from pathlib import Path
 
@@ -5,8 +6,9 @@ from fastai.vision.data import (
     IndexSplitter,
     DataBlock,
     ImageBlock,
-    CategoryBlock,
+    MultiCategoryBlock,
     RegexLabeller,
+    Pipeline,
 )
 from fastai.vision.augment import (
     RandomResizedCrop,
@@ -16,7 +18,7 @@ from fastai.vision.augment import (
 )
 
 from fastai.callback import schedule  # noqa: F401
-from fastai.vision.learner import vision_learner, accuracy
+from fastai.vision.learner import vision_learner, accuracy_multi
 
 from birds import config
 from birds.utils.kaggle import download_dataset
@@ -41,6 +43,10 @@ def BirdsSplitter(path):
     return IndexSplitter(valid_idx)
 
 
+def label_to_list(o):
+    return [o]
+
+
 if __name__ == "__main__":
     bs = 64
 
@@ -62,19 +68,25 @@ if __name__ == "__main__":
     ]
 
     birds = DataBlock(
-        blocks=(ImageBlock, CategoryBlock),
+        blocks=(ImageBlock, MultiCategoryBlock),
         get_items=get_birds_images,
         splitter=BirdsSplitter(path),
-        get_y=RegexLabeller(pat=r"/([^/]+)_\d+_\d+\.jpg"),
+        get_y=Pipeline([RegexLabeller(pat=r"/([^/]+)_\d+_\d+\.jpg"), label_to_list]),
         item_tfms=item_tfms,
         batch_tfms=batch_tfms,
     )
 
     dls = birds.dataloaders(path)
 
-    learner = vision_learner(dls, "vit_tiny_patch16_224", metrics=[accuracy])
+    learner = vision_learner(
+        dls, "vit_tiny_patch16_224", metrics=[partial(accuracy_multi, thresh=0.95)]
+    )
 
-    learner.fine_tune(7, base_lr=0.001, freeze_epochs=12)
+    # during training we don’t want to bias the model towards extreme predictions,
+    # so we train with a threshold of 0.5, but when we deploy the model we
+    # make sure that it’s set to 0.95
+    learner.fine_tune(7, base_lr=0.006, freeze_epochs=12)
+    learner.loss_func.thresh = 0.95
 
     learner.export(Path(config.MODELS_STORAGE_PATH).resolve() / "vit_exported.pkl")
     learner.model_dir = Path(config.MODELS_STORAGE_PATH).resolve()
