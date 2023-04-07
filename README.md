@@ -1,8 +1,8 @@
 ---
 title: Birds classifier
 emoji: 🐦
-colorFrom: red
-colorTo: pink
+colorFrom: white
+colorTo: blue
 sdk: gradio
 sdk_version: 3.20.1
 app_file: app.py
