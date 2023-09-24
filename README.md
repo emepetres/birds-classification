@@ -6,6 +6,8 @@ Training is done using fastai, deployment mimics its transforms to publish a gra
 
 It automatically publish to Hugging Face after a pull request is succesfully merged in main branch.
 
+<https://huggingface.co/spaces/jcarnero/birds-classification>
+
 ## Train
 
 ```bash
